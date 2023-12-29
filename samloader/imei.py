@@ -2,6 +2,7 @@
 
 import random
 
+from . import tacs
 
 def imei_required(args):
     """
@@ -41,9 +42,12 @@ def fixup_imei(args):
         return 0
 
     if not args.dev_imei:
-        print("samsung now requires an imei to be set to download updates")
-        print("Please set it or a prefix (at least 8 digits) through -i / --dev-imei")
-        return 1
+        found = tacs.TACS.get(args.dev_model)
+        if not found:
+            print(f"No known tacs for {args.dev_model}, set it manually through --dev-imei")
+            print("(Also consider submitting it to https://github.com/zacharee/SamloaderKotlin/issues/116)")
+            return 1
+        args.dev_imei = random.choice(found)
 
     if not args.dev_imei.isdecimal():
         # probably a serial number, leave as is
